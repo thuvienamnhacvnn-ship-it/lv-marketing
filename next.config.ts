@@ -2,13 +2,14 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    /**
-     * Cho phép tối ưu SVG vì toàn bộ file trong `public/templates` do chính
-     * `scripts/generate-templates.mjs` sinh ra — không nhận SVG từ nguồn ngoài.
+    /*
+     * KHÔNG bật `dangerouslyAllowSVG`. Trước đây cờ này được bật để phục vụ
+     * `public/templates` do `scripts/generate-templates.mjs` sinh ra — cả thư mục
+     * lẫn script đều không còn tồn tại, và template hiện được dựng bằng React
+     * (`src/components/marketing/template-card.tsx`) chứ không phải file SVG.
+     * Không ảnh SVG nào đi qua trình tối ưu ảnh, nên bật cờ này chỉ mở thêm bề
+     * mặt tấn công mà không đổi lại được gì.
      */
-    dangerouslyAllowSVG: true,
-    contentDispositionType: "attachment",
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
       {
         protocol: "https",

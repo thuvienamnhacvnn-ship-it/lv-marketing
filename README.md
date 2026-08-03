@@ -1,36 +1,91 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LV Marketing Hub
 
-## Getting Started
+Nền tảng marketing cho doanh nghiệp địa phương của người Việt tại Đức — nhà hàng,
+tiệm nail, spa, quán café, cửa hàng bán lẻ và showroom vật liệu.
 
-First, run the development server:
+Sản phẩm của **LV GROUP** (Berlin), song ngữ tiếng Việt và tiếng Đức.
+
+## Trạng thái hiện tại
+
+| Phần | Tình trạng |
+| --- | --- |
+| Trang marketing (11 trang, VI/DE) | Xong |
+| Hệ 2 theme sáng/tối | Xong |
+| Đăng ký / đăng nhập (giao diện + server action) | Xong |
+| Schema cơ sở dữ liệu (51 model, đa tenant) | Xong |
+| Lớp dịch vụ AI Claude (8 tác vụ) | Xong, **chưa có màn hình nào gọi tới** |
+| Khu vực app sau đăng nhập (`/app`) | **Chưa có** |
+| Route `/api` (kể cả `/api/auth/[...nextauth]`) | **Chưa có** |
+| `prisma/seed.ts` | **Chưa có** (đã khai trong `package.json`) |
+
+> Đăng nhập thành công hiện chuyển hướng tới `/app` — route này chưa tồn tại nên
+> sẽ ra trang 404. Đây là việc lớn nhất còn lại.
+
+## Chạy thử
+
+Yêu cầu Node.js 20 trở lên.
 
 ```bash
+npm install
+cp .env.example .env    # rồi điền giá trị thật
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Mở http://localhost:3000 — trang gốc tự chuyển sang `/vi` hoặc `/de` theo cookie
+ngôn ngữ, mặc định tiếng Việt.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Trang marketing chạy được mà không cần database.** Đăng ký, đăng nhập và form
+liên hệ thì cần PostgreSQL — xem [docs/ket-noi-database.md](docs/ket-noi-database.md).
+Các tính năng AI cần `ANTHROPIC_API_KEY`; để trống thì ứng dụng vẫn chạy nhưng mọi
+nút AI báo "chưa cấu hình" thay vì giả lập kết quả.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Lệnh
 
-## Learn More
+| Lệnh | Việc |
+| --- | --- |
+| `npm run dev` | Máy chủ phát triển (Turbopack) |
+| `npm run build` | Build production |
+| `npm run typecheck` | Kiểm tra kiểu, không xuất file |
+| `npm run lint` | ESLint |
+| `npm run db:push` | Đẩy schema vào database (chưa tạo migration) |
+| `npm run db:migrate` | Tạo và chạy migration |
+| `npm run db:studio` | Mở Prisma Studio |
 
-To learn more about Next.js, take a look at the following resources:
+## Công nghệ
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Next.js 16 (App Router, Turbopack) · React 19 · TypeScript · Tailwind CSS v4 ·
+Base UI · framer-motion · Prisma 7 + PostgreSQL · Auth.js v5 · Anthropic Claude SDK
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Cấu trúc
 
-## Deploy on Vercel
+```
+src/
+  app/(marketing)/[locale]/   Trang marketing — ngôn ngữ nằm trong URL
+  app/(auth)/                 Đăng nhập, đăng ký — ngôn ngữ lấy từ cookie
+  components/ui/              Component nền, bọc Base UI
+  components/marketing/       Component riêng của trang marketing
+  components/motion/          Hiệu ứng dùng chung (reveal, parallax, marquee)
+  config/                     Cấu hình site, theme, danh mục giải pháp
+  data/                       Registry ảnh và template ấn phẩm
+  features/                   Server action theo nghiệp vụ
+  i18n/                       Từ điển VI/DE
+  server/                     Auth, phân quyền, ngữ cảnh tenant
+  services/ai/                Lớp gọi Claude: prompt, schema, runner
+  proxy.ts                    Định tuyến ngôn ngữ (middleware của Next 16)
+prisma/schema.prisma          Schema cơ sở dữ liệu
+docs/                         Tài liệu vận hành
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Quy ước
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Chỉ dùng token màu, không hardcode màu.** Mọi màu khai trong `src/app/globals.css`
+  theo hai theme `light` và `dark`, chuyển bằng thuộc tính `data-theme` trên `<html>`.
+- **Ảnh lấy từ registry** `src/data/media.ts` để mọi ảnh đều có `alt` đúng ngôn ngữ.
+  Hiện phần lớn là ảnh stock Unsplash — danh sách ảnh thật cần chụp nằm ở
+  [docs/danh-sach-anh-can-chup.md](docs/danh-sach-anh-can-chup.md).
+- **Từ điển tiếng Việt là chuẩn về cấu trúc** (`src/i18n/dictionaries/vi.ts` khai
+  `type Dictionary`), bản tiếng Đức phải khớp đúng shape đó.
+
+## Giấy phép
+
+Mã nguồn thuộc sở hữu của LV GROUP. Chưa phát hành công khai.

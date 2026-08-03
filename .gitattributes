@@ -1,0 +1,21 @@
+# Chuẩn hoá ký tự xuống dòng.
+#
+# Dự án đang phát triển trên Windows (CRLF) nhưng deploy trên Linux (LF). Không
+# có file này thì mỗi lần người dùng hệ điều hành khác mở repo, Git báo TOÀN BỘ
+# file đã đổi dù không ai sửa gì — diff giả nuốt mất thay đổi thật.
+#
+# `text=auto eol=lf`: kho lưu luôn dùng LF, còn khi checkout Git tự chuyển theo
+# hệ điều hành đang dùng.
+* text=auto eol=lf
+
+# Ảnh và font là dữ liệu nhị phân — tuyệt đối không được đụng vào nội dung.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+
+# File sinh tự động: gập lại trong diff trên GitHub cho đỡ nhiễu.
+package-lock.json linguist-generated=true -diff
