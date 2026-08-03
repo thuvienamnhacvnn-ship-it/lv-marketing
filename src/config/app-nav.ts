@@ -43,7 +43,7 @@ export const NAV_GROUPS: { key: NavGroupKey; items: NavItem[] }[] = [
       { key: "campaigns", path: "campaigns", icon: "megaphone", permission: "campaign:manage", soon: true },
       { key: "reviews", path: "reviews", icon: "star", permission: "review:read", soon: true },
       { key: "automations", path: "automations", icon: "workflow", permission: "automation:manage", soon: true },
-      { key: "loyalty", path: "loyalty", icon: "gift", permission: "loyalty:manage", soon: true },
+      { key: "loyalty", path: "loyalty", icon: "gift", permission: "loyalty:manage" },
       { key: "pages", path: "pages", icon: "layout", soon: true },
       { key: "analytics", path: "analytics", icon: "chart", permission: "analytics:read", soon: true },
     ],

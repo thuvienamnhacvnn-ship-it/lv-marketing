@@ -448,6 +448,213 @@ async function seedCampaigns(organizationId: string) {
   }
 }
 
+/**
+ * Chương trình tích điểm mẫu.
+ *
+ * Mô hình lấy theo PTC-Loyalty: hạng thành viên theo điểm tích luỹ trọn đời,
+ * sổ cái ghi từng lần cộng/trừ, voucher tách mẫu và bản đã phát.
+ *
+ * Điểm quan trọng: điểm dư của khách KHÔNG được đặt tay. Nó là kết quả cộng dồn
+ * của sổ cái — đặt tay rồi sau này lệch với sổ thì không ai biết bên nào đúng.
+ */
+async function seedLoyalty(organizationId: string) {
+  if ((await prisma.loyaltyProgram.count({ where: { organizationId } })) > 0) return;
+
+  await prisma.loyaltyProgram.create({
+    data: {
+      organizationId,
+      name: "Thẻ thành viên Sen",
+      type: "SPEND_BASED",
+      isActive: true,
+      // 1 điểm cho mỗi euro, làm tròn xuống.
+      config: { pointsPerEuro: 1, roundingMode: "floor" },
+      rules: {
+        create: [
+          { name: "Tặng điểm khi đăng ký", kind: "signup", value: 50 },
+          { name: "Quà sinh nhật", kind: "birthday", value: 100 },
+          { name: "Giới thiệu bạn", kind: "referral", value: 75 },
+          { name: "Nhân đôi điểm thứ Ba", kind: "double_points", value: 2, config: { weekday: 2 } },
+        ],
+      },
+    },
+  });
+
+  const tierData = [
+    { name: "Đồng", level: 1, minPoints: 0, pointsMultiplier: 1.0, color: "#a16207", perks: "Tích điểm mọi hoá đơn" },
+    { name: "Bạc", level: 2, minPoints: 500, pointsMultiplier: 1.1, color: "#94a3b8", perks: "Ưu tiên đặt bàn cuối tuần" },
+    { name: "Vàng", level: 3, minPoints: 1500, pointsMultiplier: 1.25, color: "#eab308", perks: "Món khai vị tặng kèm, sinh nhật giảm 20%" },
+    { name: "Bạch kim", level: 4, minPoints: 4000, pointsMultiplier: 1.5, color: "#6366f1", perks: "Bàn riêng, đặt tiệc ưu tiên, quà cuối năm" },
+  ];
+  const tiers = [];
+  for (const tier of tierData) {
+    tiers.push(await prisma.membershipTier.create({ data: { organizationId, ...tier } }));
+  }
+
+  const rewards = [
+    { name: "Cà phê sữa đá", pointsCost: 120, stock: null, description: "Đổi bất kỳ lúc nào" },
+    { name: "Gỏi cuốn tôm thịt", pointsCost: 250, stock: 40, description: "Hai cuốn, dùng tại chỗ" },
+    { name: "Giảm 10 € hoá đơn", pointsCost: 600, stock: null, description: "Áp dụng cho hoá đơn từ 40 €" },
+    { name: "Set ăn hai người", pointsCost: 1800, stock: 10, description: "Khai vị, hai món chính, tráng miệng" },
+  ];
+  for (const reward of rewards) {
+    await prisma.reward.create({ data: { organizationId, status: "ACTIVE", ...reward } });
+  }
+
+  const voucher = await prisma.voucher.create({
+    data: {
+      organizationId,
+      code: "SINHNHAT20",
+      title: "Giảm 20% dịp sinh nhật",
+      description: "Tự phát trước sinh nhật khách 7 ngày, dùng trong 30 ngày.",
+      discountType: "PERCENT",
+      discountValue: 20,
+      pointsCost: 0,
+      perCustomerLimit: 1,
+      autoBirthday: true,
+      status: "ACTIVE",
+      expiresAt: daysAhead(180),
+    },
+  });
+
+  await prisma.voucher.create({
+    data: {
+      organizationId,
+      code: "DOI500",
+      title: "Voucher 5 € đổi bằng điểm",
+      description: "Đổi 500 điểm lấy phiếu giảm 5 €.",
+      discountType: "FIXED",
+      discountValue: 5,
+      pointsCost: 500,
+      quantity: 200,
+      perCustomerLimit: 4,
+      status: "ACTIVE",
+    },
+  });
+
+  // Bốn khách đã seed ở seedCrm. Mỗi người một mức độ gắn bó khác nhau để màn
+  // hình có đủ các hạng, chứ không phải ai cũng giống ai.
+  const customers = await prisma.customer.findMany({
+    where: { organizationId },
+    orderBy: { createdAt: "asc" },
+  });
+
+  /** Kịch bản chi tiêu: mỗi phần tử là một hoá đơn, tính bằng xu. */
+  const scripts: number[][] = [
+    [4200, 3800, 5600, 2900, 6100, 4400, 3200, 5900],
+    [8900, 12400, 7600, 9800, 11200, 6400, 8100, 13500, 7200, 9100, 10400, 8800, 6900, 12100],
+    [3400, 2800, 4100],
+    [15600, 18200, 14100, 16800, 19400, 13200, 17500, 15900, 12800, 16100,
+     18900, 14700, 17200, 15300, 19800, 13600, 16400, 18100, 14900, 17800, 15100],
+  ];
+
+  for (const [index, customer] of customers.entries()) {
+    const invoices = scripts[index] ?? scripts[0];
+    const memberCode = `SEN${String(index + 1).padStart(4, "0")}`;
+
+    const account = await prisma.loyaltyAccount.create({
+      data: {
+        organizationId,
+        customerId: customer.id,
+        memberCode,
+        joinedAt: daysAgo(120 - index * 20),
+      },
+    });
+
+    let balance = 0;
+    let earned = 0;
+    let redeemed = 0;
+
+    // Điểm thưởng lúc đăng ký — đúng như luật "signup" khai ở trên.
+    const signup = 50;
+    balance += signup;
+    earned += signup;
+    await prisma.pointTransaction.create({
+      data: {
+        organizationId,
+        customerId: customer.id,
+        type: "BONUS",
+        points: signup,
+        balanceBefore: 0,
+        balanceAfter: balance,
+        note: "Điểm chào mừng thành viên mới",
+        createdAt: account.joinedAt,
+      },
+    });
+
+    for (const [i, amountCents] of invoices.entries()) {
+      const points = Math.floor(amountCents / 100);
+      const before = balance;
+      balance += points;
+      earned += points;
+      await prisma.pointTransaction.create({
+        data: {
+          organizationId,
+          customerId: customer.id,
+          type: "EARN",
+          amountCents,
+          points,
+          balanceBefore: before,
+          balanceAfter: balance,
+          receiptRef: `${memberCode}-R${String(i + 1).padStart(3, "0")}`,
+          createdAt: daysAgo(Math.max(1, 110 - index * 18 - i * 4)),
+        },
+      });
+    }
+
+    // Khách gắn bó lâu thì đã đổi quà vài lần.
+    if (index === 1 || index === 3) {
+      const spend = index === 3 ? 600 : 250;
+      const before = balance;
+      balance -= spend;
+      redeemed += spend;
+      await prisma.pointTransaction.create({
+        data: {
+          organizationId,
+          customerId: customer.id,
+          type: "REDEEM",
+          points: -spend,
+          balanceBefore: before,
+          balanceAfter: balance,
+          note: index === 3 ? "Đổi voucher giảm 10 €" : "Đổi gỏi cuốn tôm thịt",
+          createdAt: daysAgo(6 + index),
+        },
+      });
+    }
+
+    // Số dư ghi vào tài khoản là KẾT QUẢ của sổ cái, không phải số đặt tay.
+    await prisma.loyaltyAccount.update({
+      where: { id: account.id },
+      data: { points: balance, totalEarned: earned, totalRedeemed: redeemed },
+    });
+
+    // Hạng xét theo điểm tích luỹ trọn đời, không theo số dư hiện tại — khách
+    // đổi quà nhiều không vì thế mà bị tụt hạng.
+    const tier = [...tiers].reverse().find((t) => earned >= t.minPoints) ?? tiers[0];
+    await prisma.customerMembership.create({
+      data: { organizationId, customerId: customer.id, tierId: tier.id, status: "ACTIVE" },
+    });
+
+    if (index < 2) {
+      await prisma.issuedVoucher.create({
+        data: {
+          organizationId,
+          voucherId: voucher.id,
+          customerId: customer.id,
+          code: `${voucher.code}-${memberCode}`,
+          status: index === 0 ? "ISSUED" : "REDEEMED",
+          redeemedAt: index === 1 ? daysAgo(4) : null,
+          expiresAt: daysAhead(30),
+        },
+      });
+    }
+  }
+
+  await prisma.voucher.update({
+    where: { id: voucher.id },
+    data: { issuedCount: Math.min(2, customers.length) },
+  });
+}
+
 async function main() {
   console.log("Bắt đầu seed…");
 
@@ -461,6 +668,7 @@ async function main() {
   await seedCrm(organization.id);
   await seedInboxAndReviews(organization.id);
   await seedCampaigns(organization.id);
+  await seedLoyalty(organization.id);
 
   console.log(`  tổ chức demo "${organization.name}" (/${organization.slug})`);
   console.log("");
