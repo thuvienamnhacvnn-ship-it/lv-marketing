@@ -11,6 +11,9 @@
  * Toàn bộ dùng `upsert` theo khoá tự nhiên nên chạy lại nhiều lần vẫn cho cùng
  * một kết quả — không nhân bản dữ liệu.
  */
+// Bắt buộc và phải đứng đầu: `tsx prisma/seed.ts` là script Node thuần, không
+// đi qua Next hay prisma.config.ts nên không có ai nạp `.env` hộ.
+import "dotenv/config";
 import { hash } from "bcryptjs";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
