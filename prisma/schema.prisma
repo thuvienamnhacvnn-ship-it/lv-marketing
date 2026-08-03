@@ -253,10 +253,70 @@ enum AutomationRunStatus {
   TEST
 }
 
+/// Trạng thái của MẪU voucher do chủ quán tạo.
 enum VoucherStatus {
+  DRAFT
   ACTIVE
+  PAUSED
+  EXPIRED
+  ARCHIVED
+}
+
+/// Trạng thái của một bản voucher ĐÃ PHÁT cho khách cụ thể.
+enum IssuedVoucherStatus {
+  ISSUED
   REDEEMED
   EXPIRED
+  CANCELLED
+}
+
+enum VoucherDiscountType {
+  PERCENT
+  FIXED
+  FREE_ITEM
+}
+
+enum LoyaltyProgramType {
+  SPEND_BASED
+  VISIT_BASED
+  BUY_X_GET_Y
+  DIGITAL_STAMP
+  TIER
+  CASHBACK
+}
+
+enum MembershipStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum PointTransactionType {
+  EARN
+  REDEEM
+  BONUS
+  REFUND
+  ADJUSTMENT
+  EXPIRE
+  REFERRAL
+  BIRTHDAY
+}
+
+enum PointTransactionStatus {
+  PENDING
+  COMPLETED
+  REVERSED
+  FAILED
+}
+
+enum RewardStatus {
+  ACTIVE
+  INACTIVE
+  OUT_OF_STOCK
+}
+
+enum RedemptionStatus {
+  PENDING
+  FULFILLED
   CANCELLED
 }
 
@@ -374,21 +434,22 @@ model User {
   sessions    Session[]
   memberships OrganizationMember[]
 
-  createdContent  ContentItem[]           @relation("ContentAuthor")
-  contentVersions ContentVersion[]
-  approvals       ContentApproval[]
-  assignedLeads   Lead[]                  @relation("LeadOwner")
-  leadActivities  LeadActivity[]
-  assignedConvos  Conversation[]          @relation("ConversationAssignee")
-  messages        Message[]
-  reviewReplies   ReviewReply[]
-  uploadedAssets  Asset[]
-  serviceRequests ServiceRequest[]        @relation("ServiceRequester")
-  requestMessages ServiceRequestMessage[]
-  notifications   Notification[]
-  auditLogs       AuditLog[]
-  aiGenerations   AiGeneration[]
-  tickets         SupportTicket[]         @relation("TicketAuthor")
+  createdContent    ContentItem[]           @relation("ContentAuthor")
+  contentVersions   ContentVersion[]
+  approvals         ContentApproval[]
+  assignedLeads     Lead[]                  @relation("LeadOwner")
+  leadActivities    LeadActivity[]
+  assignedConvos    Conversation[]          @relation("ConversationAssignee")
+  messages          Message[]
+  reviewReplies     ReviewReply[]
+  uploadedAssets    Asset[]
+  serviceRequests   ServiceRequest[]        @relation("ServiceRequester")
+  requestMessages   ServiceRequestMessage[]
+  notifications     Notification[]
+  auditLogs         AuditLog[]
+  aiGenerations     AiGeneration[]
+  tickets           SupportTicket[]         @relation("TicketAuthor")
+  pointTransactions PointTransaction[]      @relation("PointTransactionStaff")
 
   @@index([systemRole])
 }
@@ -437,53 +498,60 @@ model VerificationToken {
 // ────────────────────────────────────────────────────────────
 
 model Organization {
-  id       String   @id @default(cuid())
-  name     String
-  slug     String   @unique
-  industry Industry @default(OTHER)
-  logoUrl  String?
-  city     String?
-  country  String   @default("DE")
-  timezone String   @default("Europe/Berlin")
-  locale   String   @default("vi")
-  isDemo   Boolean  @default(false)
-  isActive Boolean  @default(true)
+  id               String   @id @default(cuid())
+  name             String
+  slug             String   @unique
+  industry         Industry @default(OTHER)
+  logoUrl          String?
+  city             String?
+  country          String   @default("DE")
+  timezone         String   @default("Europe/Berlin")
+  locale           String   @default("vi")
+  isDemo           Boolean  @default(false)
+  isActive         Boolean  @default(true)
   /// Account manager phía LV GROUP phụ trách tenant này.
   accountManagerId String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-  members         OrganizationMember[]
-  branches        Branch[]
-  brandProfiles   BrandProfile[]
-  connections     SocialConnection[]
-  channels        SocialChannel[]
-  contentItems    ContentItem[]
-  schedules       ContentSchedule[]
-  publishedPosts  PublishedPost[]
-  assetFolders    AssetFolder[]
-  assets          Asset[]
-  campaigns       Campaign[]
-  customers       Customer[]
-  customerTags    CustomerTag[]
-  conversations   Conversation[]
-  leads           Lead[]
-  pipelineStages  PipelineStage[]
-  appointments    Appointment[]
-  reviews         Review[]
-  automations     Automation[]
-  vouchers        Voucher[]
-  loyaltyAccounts LoyaltyAccount[]
-  serviceRequests ServiceRequest[]
-  landingPages    LandingPage[]
-  subscription    Subscription?
-  usageRecords    UsageRecord[]
-  aiGenerations   AiGeneration[]
-  strategies      StrategyDocument[]
-  metrics         ChannelMetric[]
-  notifications   Notification[]
-  auditLogs       AuditLog[]
-  tickets         SupportTicket[]
+  members           OrganizationMember[]
+  branches          Branch[]
+  brandProfiles     BrandProfile[]
+  connections       SocialConnection[]
+  channels          SocialChannel[]
+  contentItems      ContentItem[]
+  schedules         ContentSchedule[]
+  publishedPosts    PublishedPost[]
+  assetFolders      AssetFolder[]
+  assets            Asset[]
+  campaigns         Campaign[]
+  customers         Customer[]
+  customerTags      CustomerTag[]
+  conversations     Conversation[]
+  leads             Lead[]
+  pipelineStages    PipelineStage[]
+  appointments      Appointment[]
+  reviews           Review[]
+  automations       Automation[]
+  vouchers          Voucher[]
+  issuedVouchers    IssuedVoucher[]
+  loyaltyAccounts   LoyaltyAccount[]
+  loyaltyPrograms   LoyaltyProgram[]
+  membershipTiers   MembershipTier[]
+  memberships       CustomerMembership[]
+  pointTransactions PointTransaction[]
+  rewards           Reward[]
+  rewardRedemptions RewardRedemption[]
+  serviceRequests   ServiceRequest[]
+  landingPages      LandingPage[]
+  subscription      Subscription?
+  usageRecords      UsageRecord[]
+  aiGenerations     AiGeneration[]
+  strategies        StrategyDocument[]
+  metrics           ChannelMetric[]
+  notifications     Notification[]
+  auditLogs         AuditLog[]
+  tickets           SupportTicket[]
 
   @@index([industry])
   @@index([accountManagerId])
@@ -518,12 +586,16 @@ model Branch {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  brandProfile BrandProfile?
-  contentItems ContentItem[]
-  customers    Customer[]
-  appointments Appointment[]
-  reviews      Review[]
+  organization      Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  brandProfile      BrandProfile?
+  contentItems      ContentItem[]
+  customers         Customer[]
+  appointments      Appointment[]
+  reviews           Review[]
+  loyaltyPrograms   LoyaltyProgram[]
+  pointTransactions PointTransaction[]
+  vouchers          Voucher[]
+  rewards           Reward[]
 
   @@index([organizationId])
 }
@@ -877,16 +949,19 @@ model Customer {
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
-  organization   Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  branch         Branch?                 @relation(fields: [branchId], references: [id], onDelete: SetNull)
-  tags           CustomerTagOnCustomer[]
-  conversations  Conversation[]
-  leads          Lead[]
-  appointments   Appointment[]
-  reviews        Review[]
-  vouchers       Voucher[]
-  loyalty        LoyaltyAccount?
-  automationRuns AutomationRun[]
+  organization      Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  branch            Branch?                 @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  tags              CustomerTagOnCustomer[]
+  conversations     Conversation[]
+  leads             Lead[]
+  appointments      Appointment[]
+  reviews           Review[]
+  issuedVouchers    IssuedVoucher[]
+  loyalty           LoyaltyAccount?
+  membership        CustomerMembership?
+  pointTransactions PointTransaction[]
+  rewardRedemptions RewardRedemption[]
+  automationRuns    AutomationRun[]
 
   @@index([organizationId])
   @@index([organizationId, email])
@@ -1139,25 +1214,92 @@ model AutomationRun {
   @@index([automationId, startedAt])
 }
 
-model Voucher {
-  id              String        @id @default(cuid())
-  organizationId  String
-  customerId      String?
-  code            String
-  title           String
-  description     String?
-  discountPercent Int?
-  discountCents   Int?
-  status          VoucherStatus @default(ACTIVE)
-  issuedAt        DateTime      @default(now())
-  expiresAt       DateTime?
-  redeemedAt      DateTime?
+// ────────────────────────────────────────────────────────────
+// LOYALTY
+//
+// Cấu trúc lấy theo PTC-Loyalty (ptc-bonus.com) để dữ liệu chuyển sang không
+// mất mát. Hai chỗ khác hẳn bản LV cũ:
+//
+// 1. Voucher tách làm hai. `Voucher` là MẪU do chủ quán tạo (có hạn mức phát,
+//    số điểm đổi, giới hạn mỗi khách). `IssuedVoucher` là bản đã phát cho một
+//    khách cụ thể, mỗi bản một mã riêng. Gộp làm một như trước thì không biết
+//    một mẫu đã phát bao nhiêu lần và ai còn hạn dùng.
+//
+// 2. Điểm có SỔ CÁI (`PointTransaction`) chứ không chỉ một con số dư. Không có
+//    sổ thì không đối chiếu được khi khách khiếu nại, không hoàn tác được giao
+//    dịch nhập sai, và không tính được điểm hết hạn.
+// ────────────────────────────────────────────────────────────
 
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  customer     Customer?    @relation(fields: [customerId], references: [id], onDelete: SetNull)
+model LoyaltyProgram {
+  id             String             @id @default(cuid())
+  organizationId String
+  /// null = áp dụng cho mọi chi nhánh
+  branchId       String?
+  name           String
+  type           LoyaltyProgramType @default(SPEND_BASED)
+  isActive       Boolean            @default(true)
+  /// Cấu hình riêng theo loại: số tem cần, tỉ lệ quy đổi, mua X tặng Y…
+  config         Json?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
 
-  @@unique([organizationId, code])
-  @@index([organizationId, status])
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  branch       Branch?       @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  rules        LoyaltyRule[]
+
+  @@index([organizationId, isActive])
+}
+
+model LoyaltyRule {
+  id        String   @id @default(cuid())
+  programId String
+  name      String
+  /// signup | birthday | referral | product | double_points | time_window
+  kind      String
+  value     Int      @default(0)
+  config    Json?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  program LoyaltyProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+
+  @@index([programId])
+}
+
+model MembershipTier {
+  id               String   @id @default(cuid())
+  organizationId   String
+  name             String
+  /// Thứ tự hạng: 1 thấp nhất. Dùng để so sánh, không dựa vào tên.
+  level            Int
+  /// Ngưỡng điểm TÍCH LUỸ TRỌN ĐỜI để đạt hạng, không phải điểm dư hiện tại.
+  minPoints        Int      @default(0)
+  pointsMultiplier Float    @default(1.0)
+  color            String   @default("#a16207")
+  perks            String?
+  retentionDays    Int?
+  createdAt        DateTime @default(now())
+
+  organization Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  memberships  CustomerMembership[]
+
+  @@unique([organizationId, level])
+  @@index([organizationId])
+}
+
+model CustomerMembership {
+  id             String           @id @default(cuid())
+  organizationId String
+  customerId     String           @unique
+  tierId         String
+  status         MembershipStatus @default(ACTIVE)
+  since          DateTime         @default(now())
+
+  organization Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  customer     Customer       @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  tier         MembershipTier @relation(fields: [tierId], references: [id])
+
+  @@index([organizationId])
 }
 
 model LoyaltyAccount {
@@ -1165,9 +1307,14 @@ model LoyaltyAccount {
   organizationId String
   customerId     String   @unique
   memberCode     String
+  /// Bí mật riêng của từng thẻ, dùng ký mã QR. Đổi được khi khách mất thẻ.
+  qrSecret       String   @default(cuid())
   points         Int      @default(0)
-  tier           String   @default("BASIC")
+  totalEarned    Int      @default(0)
+  totalRedeemed  Int      @default(0)
+  isBlocked      Boolean  @default(false)
   referredBy     String?
+  joinedAt       DateTime @default(now())
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -1175,6 +1322,148 @@ model LoyaltyAccount {
   customer     Customer     @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
   @@unique([organizationId, memberCode])
+}
+
+model PointTransaction {
+  id              String                 @id @default(cuid())
+  organizationId  String
+  branchId        String?
+  customerId      String
+  /// Nhân viên thực hiện. Giữ lại cả khi họ nghỉ việc nên dùng SetNull.
+  staffId         String?
+  type            PointTransactionType
+  status          PointTransactionStatus @default(COMPLETED)
+  /// Số tiền hoá đơn, đơn vị xu. Chỉ có ở giao dịch tích điểm.
+  amountCents     Int?
+  /// Có dấu: dương khi cộng, âm khi trừ.
+  points          Int
+  balanceBefore   Int
+  balanceAfter    Int
+  issuedVoucherId String?
+  /// Chặn bấm hai lần từ máy tính tiền.
+  idempotencyKey  String?
+  /// Mã hoá đơn — mỗi hoá đơn chỉ được tích điểm một lần.
+  receiptRef      String?
+  note            String?
+  device          String?
+  createdAt       DateTime               @default(now())
+
+  organization Organization                 @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  branch       Branch?                      @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  customer     Customer                     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  staff        User?                        @relation("PointTransactionStaff", fields: [staffId], references: [id], onDelete: SetNull)
+  adjustments  PointTransactionAdjustment[]
+
+  @@unique([organizationId, idempotencyKey])
+  @@unique([organizationId, receiptRef])
+  @@index([organizationId, createdAt])
+  @@index([organizationId, customerId])
+}
+
+model PointTransactionAdjustment {
+  id            String   @id @default(cuid())
+  transactionId String
+  points        Int
+  reason        String
+  createdById   String?
+  createdAt     DateTime @default(now())
+
+  transaction PointTransaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+
+  @@index([transactionId])
+}
+
+model Voucher {
+  id               String              @id @default(cuid())
+  organizationId   String
+  /// null = mọi chi nhánh
+  branchId         String?
+  code             String
+  title            String
+  description      String?
+  discountType     VoucherDiscountType @default(PERCENT)
+  discountValue    Float               @default(0)
+  /// Số điểm khách phải đổi để lấy voucher. 0 = phát tặng, không cần điểm.
+  pointsCost       Int                 @default(0)
+  /// null = phát không giới hạn
+  quantity         Int?
+  issuedCount      Int                 @default(0)
+  perCustomerLimit Int                 @default(1)
+  requiredTierId   String?
+  /// Tự phát vào dịp sinh nhật khách.
+  autoBirthday     Boolean             @default(false)
+  status           VoucherStatus       @default(DRAFT)
+  startsAt         DateTime?
+  expiresAt        DateTime?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  organization Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  branch       Branch?         @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  issued       IssuedVoucher[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId, status])
+}
+
+model IssuedVoucher {
+  id             String              @id @default(cuid())
+  organizationId String
+  voucherId      String
+  customerId     String
+  /// Mã riêng của từng bản đã phát — đây là mã khách đưa ra khi thanh toán.
+  code           String              @unique
+  status         IssuedVoucherStatus @default(ISSUED)
+  issuedAt       DateTime            @default(now())
+  redeemedAt     DateTime?
+  expiresAt      DateTime?
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  voucher      Voucher      @relation(fields: [voucherId], references: [id], onDelete: Cascade)
+  customer     Customer     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, status])
+  @@index([customerId])
+}
+
+model Reward {
+  id             String       @id @default(cuid())
+  organizationId String
+  branchId       String?
+  name           String
+  description    String?
+  imageUrl       String?
+  pointsCost     Int
+  /// null = không giới hạn tồn
+  stock          Int?
+  redeemLimit    Int?
+  status         RewardStatus @default(ACTIVE)
+  expiresAt      DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  branch       Branch?            @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  redemptions  RewardRedemption[]
+
+  @@index([organizationId, status])
+}
+
+model RewardRedemption {
+  id             String           @id @default(cuid())
+  organizationId String
+  rewardId       String
+  customerId     String
+  pointsSpent    Int
+  status         RedemptionStatus @default(PENDING)
+  createdAt      DateTime         @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  reward       Reward       @relation(fields: [rewardId], references: [id], onDelete: Cascade)
+  customer     Customer     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([customerId])
 }
 
 // ────────────────────────────────────────────────────────────
@@ -1264,10 +1553,10 @@ model ServiceRequestMessage {
 // ────────────────────────────────────────────────────────────
 
 model Plan {
-  id          String  @id @default(cuid())
-  key         PlanKey @unique
-  name        String
-  description String
+  id             String   @id @default(cuid())
+  key            PlanKey  @unique
+  name           String
+  description    String
   /// null = báo giá theo nhu cầu, không hiển thị giá cố định.
   monthlyCents   Int?
   currency       String   @default("EUR")
