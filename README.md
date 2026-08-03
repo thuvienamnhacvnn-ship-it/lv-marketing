@@ -63,6 +63,40 @@ nút AI báo "chưa cấu hình" thay vì giả lập kết quả.
 | `npm run db:migrate` | Tạo và chạy migration |
 | `npm run db:studio` | Mở Prisma Studio |
 
+## Đưa lên Vercel
+
+Import repo vào Vercel là chạy được — không cần `vercel.json`, không cần chỉnh
+lệnh build. `postinstall` tự chạy `prisma generate` (thư mục `src/generated/prisma`
+bị gitignore nên phải sinh lại lúc build).
+
+Khai các biến môi trường sau trong **Project Settings → Environment Variables**:
+
+| Biến | Bắt buộc | Ghi chú |
+| --- | --- | --- |
+| `DATABASE_URL` | Có | **Phải dùng endpoint pooled.** Với Neon là chuỗi có `-pooler` trong hostname. Dùng endpoint trực tiếp thì mỗi lần gọi hàm serverless mở một kết nối mới và cạn hạn mức rất nhanh. |
+| `AUTH_SECRET` | Có | Sinh chuỗi mới cho production bằng `npx auth secret`, đừng dùng lại chuỗi ở máy cá nhân. |
+| `AUTH_URL` | Không | `authConfig` đã bật `trustHost: true` nên Auth.js tự lấy domain từ header. Chỉ khai khi chạy sau proxy khác. |
+| `ANTHROPIC_API_KEY` | Không | Thiếu thì các nút AI báo "chưa cấu hình" thay vì giả lập kết quả. |
+| `CRON_SECRET` | Không | Dành cho endpoint đăng bài theo lịch (chưa dựng). |
+
+### Vùng đặt máy chủ
+
+Đặt Vercel Function cùng vùng với database, nếu không mỗi truy vấn phải đi vòng
+nửa vòng trái đất. Khách hàng ở Đức nên phương án tốt nhất là **database Frankfurt
+(`eu-central-1`) + function `fra1`**. Nếu database đang ở Mỹ thì để function theo
+mặc định (`iad1`) còn hơn ép sang `fra1`.
+
+### Chuẩn bị database production
+
+```
+npm run db:check    # xác nhận database trống hoặc chỉ của dự án này
+npm run db:push
+npm run db:seed     # tuỳ chọn — chỉ khi muốn có dữ liệu demo
+```
+
+`db:seed` tạo tài khoản demo với mật khẩu công khai trong tài liệu này. **Đừng chạy
+trên database thật đang có khách hàng.**
+
 ## Công nghệ
 
 Next.js 16 (App Router, Turbopack) · React 19 · TypeScript · Tailwind CSS v4 ·
