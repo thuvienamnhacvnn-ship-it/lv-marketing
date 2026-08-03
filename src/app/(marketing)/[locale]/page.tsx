@@ -17,7 +17,7 @@ import { Photo } from "@/components/brand/photo";
 import { HeroStage } from "@/components/marketing/hero-stage";
 import { HeroCarousel } from "@/components/marketing/hero-carousel";
 import { TemplateCard } from "@/components/marketing/template-card";
-import { DashboardPreview, type PreviewVariant } from "@/components/marketing/dashboard-preview";
+import { PlatformTour } from "@/components/marketing/platform-tour";
 import { IndustryTabs } from "@/components/marketing/industry-tabs";
 import { TemplateGallery } from "@/components/marketing/template-gallery";
 import { EcosystemTabs } from "@/components/marketing/ecosystem-tabs";
@@ -133,7 +133,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <ProcessRail t={t.process} />
       </Band>
 
-      {/* ══ 7 · BÊN TRONG NỀN TẢNG — lưới lệch nhịp ═══════ */}
+      {/* ══ 7 · BÊN TRONG NỀN TẢNG — bấm chọn từng module ══ */}
       <Band tone="ink">
         <SectionHeading
           eyebrow={t.demo.eyebrow}
@@ -143,66 +143,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           className="[&_h2]:text-slab-ink [&_p:last-of-type]:text-slab-ink-soft"
         />
 
-        {/*
-          Lưới 12 cột, mỗi module một bề rộng khác nhau theo `DEMO_SPANS`.
-          Lưới đều 6 ô như trước khiến sáu tính năng trông ngang hàng nhau,
-          trong khi Calendar và Studio mới là thứ đáng xem nhất.
-        */}
-        <RevealGroup className="mt-14 grid gap-5 lg:grid-cols-12">
-          {t.demo.modules.map((mod, i) => {
-            const scene = DEMO_SCENES[i] ?? DEMO_SCENES[0];
-            return (
-              <RevealItem key={mod.key} className={DEMO_SPANS[i] ?? "lg:col-span-4"}>
-                <div className="border-slab-line group h-full overflow-hidden rounded-3xl border bg-white/[0.06] backdrop-blur-sm transition-colors duration-400 hover:bg-white/[0.1]">
-                  {/*
-                    Ảnh thật của ngành nằm dưới, ảnh chụp giao diện đè lên trên:
-                    ghép hai thứ trong một khung cho thấy màn hình nào dùng cho
-                    tình huống nào, thay vì sáu ảnh giao diện trôi nổi không bối cảnh.
-                  */}
-                  <div className="relative h-40 overflow-hidden sm:h-48">
-                    <Photo
-                      name={scene.photo}
-                      locale={locale}
-                      width={720}
-                      height={420}
-                      sizes="(min-width: 1024px) 30vw, 92vw"
-                      className="h-full w-full transition-transform duration-700 group-hover:scale-105"
-                    />
-                    <span
-                      className="absolute inset-0"
-                      style={{
-                        background:
-                          "linear-gradient(180deg, rgba(20,23,26,0.25) 0%, rgba(20,23,26,0.85) 100%)",
-                      }}
-                      aria-hidden
-                    />
-                    <span
-                      className={cn(
-                        "absolute top-3 left-3 rounded-full px-3 py-1 text-[0.65rem] font-bold text-white",
-                        scene.chip,
-                      )}
-                    >
-                      {scene.tag}
-                    </span>
-                  </div>
-
-                  <div className="px-5 pb-5">
-                    {/* Kéo ảnh giao diện lên đè một phần ảnh nền */}
-                    <div className="bg-paper-2 relative -mt-12 overflow-hidden rounded-2xl p-3 shadow-[var(--shadow-lg)]">
-                      <DashboardPreview variant={mod.key as PreviewVariant} bare />
-                    </div>
-                    <div className="mt-5">
-                      <h3 className="text-slab-ink text-sm font-bold">{mod.name}</h3>
-                      <p className="text-slab-ink-soft mt-1.5 text-sm leading-relaxed">
-                        {mod.text}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </RevealItem>
-            );
-          })}
-        </RevealGroup>
+        <PlatformTour locale={locale} />
       </Band>
 
       {/* ══ 8 · THƯ VIỆN TEMPLATE ═════════════════════════ */}
@@ -505,29 +446,6 @@ const MARQUEE: PhotoKey[] = [
   "nailsDark",
   "spaProducts",
   "berlinGate",
-];
-
-/**
- * Ảnh bối cảnh cho từng module ở section "Bên trong nền tảng".
- * Thứ tự phải khớp `t.demo.modules`: calendar · studio · inbox · campaign · reviews · leads.
- */
-const DEMO_SCENES: { photo: PhotoKey; chip: string; tag: string }[] = [
-  { photo: "teamDesk", chip: "bg-brand", tag: "Nhà hàng" },
-  { photo: "phoneSocial", chip: "bg-violet", tag: "Nội dung" },
-  { photo: "manicureHands", chip: "bg-sky", tag: "Tiệm nail" },
-  { photo: "teamMeeting", chip: "bg-magenta", tag: "Chiến dịch" },
-  { photo: "spaFacial", chip: "bg-amber", tag: "Spa" },
-  { photo: "showroomChairs", chip: "bg-mint", tag: "Showroom" },
-];
-
-/** Bề rộng từng module trong lưới 12 cột — hai module đầu chiếm nửa hàng. */
-const DEMO_SPANS = [
-  "lg:col-span-7",
-  "lg:col-span-5",
-  "lg:col-span-4",
-  "lg:col-span-4",
-  "lg:col-span-4",
-  "lg:col-span-12",
 ];
 
 const SERVICE_TONES = [
