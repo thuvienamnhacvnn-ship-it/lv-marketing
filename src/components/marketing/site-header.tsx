@@ -87,7 +87,7 @@ export function SiteHeader({
           */}
           <Link
             href={`/${locale}`}
-            className="focus-visible:ring-brand/50 hidden shrink-0 rounded-full focus-visible:ring-2 focus-visible:outline-none lg:inline-flex"
+            className="focus-visible:ring-brand/50 hidden shrink-0 rounded-full focus-visible:ring-2 focus-visible:outline-none md:inline-flex"
           >
             <LvLogo size={36} withWordmark priority />
           </Link>
@@ -142,8 +142,8 @@ export function SiteHeader({
             </Button>
           </div>
 
-          {/* ml-auto: không còn logo bên trái nên cụm nút phải tự đẩy sang phải. */}
-          <div className="ml-auto flex items-center gap-1 lg:ml-0 lg:hidden">
+          {/* ml-auto: dưới `md` không còn logo bên trái nên cụm nút phải tự đẩy sang phải. */}
+          <div className="ml-auto flex items-center gap-1 md:ml-0 lg:hidden">
             <ThemeSwitcher locale={locale} current={theme} />
             <LocaleSwitcher locale={locale} />
             <Sheet open={open} onOpenChange={setOpen}>

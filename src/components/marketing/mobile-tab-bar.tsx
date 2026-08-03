@@ -15,6 +15,10 @@ import type { Dictionary } from "@/i18n/dictionaries/vi";
  * ngón cái. Đây là thứ tạo cảm giác "app" rõ nhất, hơn mọi hiệu ứng chuyển cảnh.
  *
  * Nút giữa nhô lên là hành động chính (dùng thử) — quy ước quen thuộc của app di động.
+ *
+ * Chỉ hiện dưới `md`. Trên iPad, đáy màn hình cách ngón cái rất xa nên thanh tab
+ * mất hết lợi thế; iPadOS cũng không dùng quy ước này. Từ 768px trở lên quay về
+ * điều hướng trên đầu trang.
  */
 export function MobileTabBar({ locale, t }: { locale: Locale; t: Dictionary["nav"] }) {
   const pathname = usePathname();
@@ -32,7 +36,7 @@ export function MobileTabBar({ locale, t }: { locale: Locale; t: Dictionary["nav
     <nav
       aria-label={t.menu}
       className={cn(
-        "border-line bg-paper-2/92 fixed inset-x-0 bottom-0 z-50 border-t backdrop-blur-xl lg:hidden",
+        "border-line bg-paper-2/92 fixed inset-x-0 bottom-0 z-50 border-t backdrop-blur-xl md:hidden",
         // Chừa chỗ cho thanh gạt Home của iPhone; máy không có thì `env()` trả 0.
         "pb-[env(safe-area-inset-bottom)]",
       )}

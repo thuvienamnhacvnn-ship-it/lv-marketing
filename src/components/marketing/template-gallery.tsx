@@ -127,7 +127,14 @@ export function TemplateGallery({ locale }: { locale: Locale }) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.22 }}
             className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-10"
-            style={{ background: "rgba(20,23,26,0.72)", backdropFilter: "blur(8px)" }}
+            style={{
+              background: "rgba(20,23,26,0.72)",
+              // Style nội tuyến không đi qua bộ thêm tiền tố lúc build, nên phải
+              // tự khai `-webkit-`: thiếu nó thì Safari trên macOS và iPadOS
+              // không làm mờ nền, lớp phủ chỉ còn một mảng xám phẳng.
+              WebkitBackdropFilter: "blur(8px)",
+              backdropFilter: "blur(8px)",
+            }}
             onClick={() => setPreview(null)}
             role="dialog"
             aria-modal="true"

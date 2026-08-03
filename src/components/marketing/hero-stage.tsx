@@ -46,7 +46,7 @@ export function HeroStage({ locale, t }: { locale: Locale; t: Dictionary["hero"]
     <section className="lv-hero-frame relative overflow-hidden py-10">
       <MeshBackdrop />
 
-      <div className="lv-container relative grid w-full items-center gap-12 lg:grid-cols-[1.02fr_0.98fr] lg:gap-14 2xl:gap-16">
+      <div className="lv-container relative grid w-full items-center gap-8 md:grid-cols-[1.05fr_0.95fr] md:gap-8 lg:grid-cols-[1.02fr_0.98fr] lg:gap-14 2xl:gap-16">
         {/*
           `lg:ms-[3cm]` — đẩy cả cụm chữ vào trong 3cm. Dùng đơn vị `cm` thật chứ
           không quy đổi ra px: CSS hiểu `cm` trực tiếp (1cm = 37.8px ở 96dpi) nên
@@ -57,13 +57,13 @@ export function HeroStage({ locale, t }: { locale: Locale; t: Dictionary["hero"]
           Mobile: cả cụm căn giữa và dùng `flex-col` để đổi được thứ tự — hai nút
           phải xuống dưới cùng, sau dải tin cậy. Từ `lg` trở lên quay về căn trái.
         */}
-        <div className="flex w-full flex-col items-center text-center lg:items-start lg:text-left lg:ms-[3cm]">
+        <div className="flex w-full flex-col items-center text-center md:items-start md:text-left lg:ms-[3cm]">
           {/* ── Logo LV cỡ lớn ─────────────────────────────── */}
           <motion.div
             initial={reduce ? false : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55 }}
-            className="flex flex-col items-center gap-4 lg:flex-row lg:flex-wrap lg:gap-5"
+            className="flex flex-col items-center gap-4 md:flex-row md:flex-wrap md:gap-5"
           >
             {/*
               Mobile hiện logo `mark` (nền trong suốt) ở đúng 2cm — dùng đơn vị
@@ -74,9 +74,9 @@ export function HeroStage({ locale, t }: { locale: Locale; t: Dictionary["hero"]
               variant="mark"
               size={76}
               priority
-              className="w-[2cm] shrink-0 [&_img]:h-auto [&_img]:w-full lg:hidden"
+              className="w-[2cm] shrink-0 [&_img]:h-auto [&_img]:w-full md:hidden"
             />
-            <LvLogo size={104} priority className="hidden shrink-0 lg:inline-flex" />
+            <LvLogo size={104} priority className="hidden shrink-0 md:inline-flex" />
             <span className="flex flex-col leading-none">
               <span className="font-display text-ink text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl">
                 LV GROUP
@@ -164,11 +164,11 @@ export function HeroStage({ locale, t }: { locale: Locale; t: Dictionary["hero"]
             /* `order-last` đẩy hai nút xuống cuối cột trên mobile. Lưới một cột
                làm hai nút dài bằng nhau — chia đôi hàng ngang sẽ khiến nút có
                chữ dài hơn bị xuống dòng, trông lệch. */
-            className="order-last mt-7 grid w-full grid-cols-1 gap-3 lg:order-none lg:mt-7 lg:flex lg:w-auto lg:flex-wrap lg:items-center"
+            className="order-last mt-7 grid w-full grid-cols-1 gap-3 md:order-none md:flex md:w-auto md:flex-wrap md:items-center"
           >
             <Button
               size="xl"
-              className="w-full rounded-full shadow-[var(--shadow-brand)] lg:w-auto"
+              className="w-full rounded-full shadow-[var(--shadow-brand)] md:w-auto"
               render={<Link href="/register" />}
             >
               {t.primaryCta}
@@ -177,7 +177,7 @@ export function HeroStage({ locale, t }: { locale: Locale; t: Dictionary["hero"]
             <Button
               size="xl"
               variant="outline"
-              className="w-full rounded-full lg:w-auto"
+              className="w-full rounded-full md:w-auto"
               render={<Link href={`/${locale}/lien-he`} />}
             >
               <Play className="size-4" aria-hidden />
@@ -190,7 +190,7 @@ export function HeroStage({ locale, t }: { locale: Locale; t: Dictionary["hero"]
             initial={reduce ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.52 }}
-            className="border-line mt-8 flex w-full flex-wrap items-center justify-center gap-x-6 gap-y-3 border-t pt-6 lg:justify-start"
+            className="border-line mt-8 flex w-full flex-wrap items-center justify-center gap-x-6 gap-y-3 border-t pt-6 md:justify-start"
           >
             <span className="flex -space-x-2.5">
               {(["portraitWoman", "portraitMan", "teamWorking"] as const).map((name) => (

@@ -32,7 +32,7 @@ export default async function MarketingLayout({
         điện thoại (4.5rem) cộng vùng an toàn của máy có thanh gạt Home — không
         chừa thì phần cuối trang nằm khuất dưới thanh tab.
       */}
-      <main className="flex-1 pt-16 pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:pb-0">
+      <main className="flex-1 pt-16 pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0">
         {children}
       </main>
       <SiteFooter locale={locale} t={t} />
