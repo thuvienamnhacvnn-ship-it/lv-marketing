@@ -14,12 +14,24 @@ Sản phẩm của **LV GROUP** (Berlin), song ngữ tiếng Việt và tiếng 
 | Đăng ký / đăng nhập (giao diện + server action) | Xong |
 | Schema cơ sở dữ liệu (51 model, đa tenant) | Xong |
 | Lớp dịch vụ AI Claude (8 tác vụ) | Xong, **chưa có màn hình nào gọi tới** |
-| Khu vực app sau đăng nhập (`/app`) | **Chưa có** |
-| Route `/api` (kể cả `/api/auth/[...nextauth]`) | **Chưa có** |
-| `prisma/seed.ts` | **Chưa có** (đã khai trong `package.json`) |
+| `/api/auth/[...nextauth]` | Xong |
+| `prisma/seed.ts` — gói dịch vụ + tổ chức demo | Xong |
+| Khung app `/app/[slug]` — sidebar, chọn workspace, đăng xuất | Xong |
+| Trang Tổng quan (số liệu đọc thẳng từ database) | Xong |
+| 17 màn hình còn lại trong menu (Studio, Calendar, Inbox, CRM…) | **Chưa có** — hiện gắn nhãn "Sắp ra mắt" |
 
-> Đăng nhập thành công hiện chuyển hướng tới `/app` — route này chưa tồn tại nên
-> sẽ ra trang 404. Đây là việc lớn nhất còn lại.
+### Tài khoản demo
+
+Sau khi chạy `npm run db:seed`:
+
+```
+email:    demo@lv-groups.com
+mật khẩu: demo12345
+```
+
+Đăng nhập xong sẽ vào workspace `nha-hang-sen` — một nhà hàng Việt ở Berlin kèm
+dữ liệu mẫu: 3 kênh social, 7 nội dung ở các trạng thái khác nhau, 4 khách hàng,
+3 lead, 3 hội thoại, 4 đánh giá Google và 3 chiến dịch.
 
 ## Chạy thử
 
