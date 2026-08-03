@@ -59,9 +59,23 @@ export function TemplateGallery({ locale }: { locale: Locale }) {
 
       <motion.div
         layout={!reduce}
-        // Thêm cột ở màn rộng: trang tràn hai mép, dừng ở 4 cột thì mỗi ô rộng
-        // gần 600px và các mẫu dọc (`row-span-2`) đội chiều cao lưới lên rất nhiều.
-        className="mt-7 grid auto-rows-min grid-flow-row-dense grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6"
+        /*
+         * Hai bố cục khác hẳn nhau theo bề rộng.
+         *
+         * Mobile: kệ cuộn ngang hai hàng, vuốt bằng ngón cái và có điểm dừng
+         * (`snap`) — đúng thói quen dùng app. Xếp dọc thì riêng khu này đã dài
+         * 4,5 màn hình, người xem bỏ cuộc trước khi tới bảng giá.
+         *
+         * Từ `sm`: lưới dọc như cũ. Thêm cột ở màn rộng vì trang tràn hai mép,
+         * dừng ở 4 cột thì mỗi ô rộng gần 600px và các mẫu dọc (`row-span-2`)
+         * đội chiều cao lên rất nhiều.
+         */
+        className={cn(
+          "no-scrollbar mt-7 grid gap-4",
+          "-mx-5 grid-flow-col grid-rows-2 auto-cols-[42vw] snap-x snap-mandatory overflow-x-auto px-5",
+          "sm:mx-0 sm:auto-cols-auto sm:auto-rows-min sm:grid-flow-row-dense sm:grid-cols-3 sm:overflow-visible sm:px-0",
+          "lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6",
+        )}
       >
         <AnimatePresence mode="popLayout">
           {visible.map((item) => (
@@ -72,7 +86,7 @@ export function TemplateGallery({ locale }: { locale: Locale }) {
               animate={{ opacity: 1, scale: 1 }}
               exit={reduce ? undefined : { opacity: 0, scale: 0.94 }}
               transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-              className={SPAN[item.shape]}
+              className={cn("snap-start", SPAN[item.shape])}
             >
               <button
                 type="button"

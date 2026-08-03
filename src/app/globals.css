@@ -269,6 +269,24 @@
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "ss01";
     overflow-x: clip;
+
+    /*
+     * Ba quy ước làm web trên điện thoại hết cảm giác "trang web".
+     *
+     * `tap-highlight-color`: bỏ mảng xám nhấp nháy mà trình duyệt vẽ mỗi lần chạm
+     * — thứ lộ rõ nhất rằng đây là web chứ không phải app. Trạng thái bấm đã có
+     * hiệu ứng riêng của từng nút.
+     *
+     * `overscroll-behavior-y: none`: chặn kéo quá đầu/cuối trang gây nảy và chặn
+     * cả thao tác kéo-xuống-để-tải-lại của Chrome Android, vốn hay kích hoạt
+     * nhầm khi người dùng chỉ định cuộn lên.
+     *
+     * `touch-action: manipulation`: bỏ độ trễ 300ms chờ xem có phải nháy đúp
+     * để phóng to hay không, nên nút bấm phản hồi tức thì.
+     */
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+    touch-action: manipulation;
   }
 
   /*

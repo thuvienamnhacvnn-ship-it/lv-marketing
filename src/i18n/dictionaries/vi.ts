@@ -34,6 +34,8 @@ export const vi = {
     login: "Đăng nhập",
     cta: "Dùng thử nền tảng",
     menu: "Menu",
+    home: "Trang chủ",
+    contact: "Liên hệ",
   },
 
   hero: {

@@ -428,7 +428,7 @@ function Band({
       id={id}
       className={cn("relative", tone === "paper-3" && "bg-paper-3", tone === "ink" && "lv-slab")}
     >
-      <div className="lv-container py-20 lg:py-28">{children}</div>
+      <div className="lv-container py-14 sm:py-20 lg:py-28">{children}</div>
     </section>
   );
 }

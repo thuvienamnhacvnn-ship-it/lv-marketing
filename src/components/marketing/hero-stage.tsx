@@ -211,14 +211,16 @@ export function HeroStage({ locale, t }: { locale: Locale; t: Dictionary["hero"]
           <HeroBoards locale={locale} />
 
           {/* Hàng dưới: thẻ đánh giá + bảng số liệu + template trên điện thoại */}
-          <div className="mt-4 grid grid-cols-3 gap-4">
+          {/* Trên điện thoại chỉ giữ thẻ đánh giá: ba thẻ chia 390px thì thẻ nào
+              cũng hẹp đến mức không đọc nổi. */}
+          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
             <ReviewCard t={t} locale={locale} />
 
-            <div className="lv-card flex flex-col justify-between rounded-3xl p-4">
+            <div className="lv-card hidden flex-col justify-between rounded-3xl p-4 sm:flex">
               <DashboardPreview variant="analytics" bare />
             </div>
 
-            <div className="lv-slab rounded-3xl p-2" style={{ boxShadow: "var(--shadow-xl)" }}>
+            <div className="lv-slab hidden rounded-3xl p-2 sm:block" style={{ boxShadow: "var(--shadow-xl)" }}>
               <div className="overflow-hidden rounded-[1.4rem]">
                 <TemplateCard template={PHONE_TEMPLATE} locale={locale} />
               </div>

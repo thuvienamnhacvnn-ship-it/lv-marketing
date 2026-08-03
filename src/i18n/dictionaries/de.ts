@@ -36,6 +36,8 @@ export const de: Dictionary = {
     login: "Anmelden",
     cta: "Plattform testen",
     menu: "Menü",
+    home: "Start",
+    contact: "Kontakt",
   },
 
   hero: {

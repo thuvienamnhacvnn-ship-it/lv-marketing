@@ -77,22 +77,22 @@ function StudioScreen({ locale }: { locale: Locale }) {
       <div className="grid gap-4 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
         {/* Bản khai yêu cầu */}
         <div className="bg-paper-3 rounded-xl p-3.5">
-          <p className="text-ink-3 text-[0.6rem] font-bold tracking-[0.14em] uppercase">
+          <p className="text-ink-3 text-[0.79rem] sm:text-[0.6rem] font-bold tracking-[0.14em] uppercase">
             {vd(locale, "Bản khai", "Briefing")}
           </p>
           <dl className="mt-3 space-y-2.5">
             {brief.map((row) => (
               <div key={row.k} className="flex items-baseline justify-between gap-3">
-                <dt className="text-ink-3 shrink-0 text-[0.68rem]">{row.k}</dt>
+                <dt className="text-ink-3 shrink-0 text-[0.86rem] sm:text-[0.68rem]">{row.k}</dt>
                 <dd className="text-ink truncate text-[0.72rem] font-semibold">{row.v}</dd>
               </div>
             ))}
           </dl>
-          <div className="bg-brand mt-4 flex items-center justify-center gap-1.5 rounded-lg py-2 text-[0.7rem] font-bold text-white">
+          <div className="bg-brand mt-4 flex items-center justify-center gap-1.5 rounded-lg py-2 text-[0.86rem] sm:text-[0.7rem] font-bold text-white">
             <Sparkles className="size-3" aria-hidden />
             {vd(locale, "Tạo nội dung", "Inhalte erzeugen")}
           </div>
-          <p className="text-ink-3 mt-2.5 text-[0.6rem] leading-relaxed">
+          <p className="text-ink-3 mt-2.5 text-[0.79rem] sm:text-[0.6rem] leading-relaxed">
             {vd(
               locale,
               "AI đọc hồ sơ thương hiệu: món, giá, giọng văn, từ cấm.",
@@ -107,7 +107,7 @@ function StudioScreen({ locale }: { locale: Locale }) {
             <p className="text-ink text-[0.72rem] font-bold">
               {vd(locale, "3 phương án", "3 Varianten")}
             </p>
-            <span className="text-ink-3 flex items-center gap-1 text-[0.62rem]">
+            <span className="text-ink-3 flex items-center gap-1 text-[0.82rem] sm:text-[0.62rem]">
               <RefreshCw className="size-2.5" aria-hidden />
               {vd(locale, "Tạo lại", "Neu erzeugen")}
             </span>
@@ -124,17 +124,17 @@ function StudioScreen({ locale }: { locale: Locale }) {
               <p className="text-ink text-[0.72rem] leading-relaxed">{v.body}</p>
               <div className="mt-2 flex flex-wrap items-center gap-1.5">
                 {v.tags.map((tag) => (
-                  <span key={tag} className="text-violet-ink bg-violet-tint rounded px-1.5 py-0.5 text-[0.58rem] font-semibold">
+                  <span key={tag} className="text-violet-ink bg-violet-tint rounded px-1.5 py-0.5 text-[0.77rem] sm:text-[0.58rem] font-semibold">
                     {tag}
                   </span>
                 ))}
                 {v.selected ? (
-                  <span className="text-brand-ink ml-auto flex items-center gap-1 text-[0.6rem] font-bold">
+                  <span className="text-brand-ink ml-auto flex items-center gap-1 text-[0.79rem] sm:text-[0.6rem] font-bold">
                     <Check className="size-2.5" aria-hidden />
                     {vd(locale, "Đã chọn", "Gewählt")}
                   </span>
                 ) : (
-                  <span className="text-ink-3 ml-auto flex items-center gap-1 text-[0.6rem]">
+                  <span className="text-ink-3 ml-auto flex items-center gap-1 text-[0.79rem] sm:text-[0.6rem]">
                     <Copy className="size-2.5" aria-hidden />
                     {vd(locale, "Dùng bản này", "Diese nehmen")}
                   </span>
@@ -184,7 +184,7 @@ function CalendarScreen({ locale }: { locale: Locale }) {
 
       <div className="grid grid-cols-7 gap-1">
         {dayNames.map((d, i) => (
-          <p key={i} className="text-ink-3 pb-1 text-center text-[0.55rem] font-bold">
+          <p key={i} className="text-ink-3 pb-1 text-center text-[0.73rem] sm:text-[0.55rem] font-bold">
             {d}
           </p>
         ))}
@@ -199,11 +199,11 @@ function CalendarScreen({ locale }: { locale: Locale }) {
                 post ? "bg-paper-3" : "border-line border border-dashed",
               )}
             >
-              <p className="text-ink-3 text-[0.5rem] font-bold tabular-nums">{day}</p>
+              <p className="text-ink-3 text-[0.68rem] sm:text-[0.5rem] font-bold tabular-nums">{day}</p>
               {post ? (
                 <p
                   className={cn(
-                    "mt-0.5 line-clamp-2 rounded px-1 py-0.5 text-[0.5rem] leading-tight font-semibold",
+                    "mt-0.5 line-clamp-2 rounded px-1 py-0.5 text-[0.68rem] sm:text-[0.5rem] leading-tight font-semibold",
                     post.tone,
                   )}
                 >
@@ -215,7 +215,7 @@ function CalendarScreen({ locale }: { locale: Locale }) {
         })}
       </div>
 
-      <p className="text-ink-3 mt-3 text-[0.62rem]">
+      <p className="text-ink-3 mt-3 text-[0.82rem] sm:text-[0.62rem]">
         {vd(
           locale,
           "Kéo một ô sang ngày khác — lịch đăng trên Instagram, Facebook và Google tự cập nhật theo.",
@@ -248,18 +248,18 @@ function InboxScreen({ locale }: { locale: Locale }) {
               key={th.name}
               className={cn("flex items-start gap-2 rounded-lg p-2", th.on ? "bg-brand-tint" : "bg-paper-3")}
             >
-              <span className="bg-sky-tint text-sky-ink grid size-6 shrink-0 place-items-center rounded-full text-[0.55rem] font-bold">
+              <span className="bg-sky-tint text-sky-ink grid size-6 shrink-0 place-items-center rounded-full text-[0.73rem] sm:text-[0.55rem] font-bold">
                 {th.name.slice(0, 1)}
               </span>
               <span className="min-w-0 flex-1">
                 <span className="flex items-center gap-1.5">
-                  <span className="text-ink truncate text-[0.66rem] font-bold">{th.name}</span>
-                  <span className="text-ink-3 shrink-0 text-[0.55rem]">{th.ch}</span>
+                  <span className="text-ink truncate text-[0.86rem] sm:text-[0.66rem] font-bold">{th.name}</span>
+                  <span className="text-ink-3 shrink-0 text-[0.73rem] sm:text-[0.55rem]">{th.ch}</span>
                 </span>
-                <span className="text-ink-2 mt-0.5 line-clamp-1 block text-[0.6rem]">{th.last}</span>
+                <span className="text-ink-2 mt-0.5 line-clamp-1 block text-[0.79rem] sm:text-[0.6rem]">{th.last}</span>
               </span>
               {th.unread > 0 ? (
-                <span className="bg-brand shrink-0 rounded-full px-1 text-[0.52rem] font-bold text-white tabular-nums">
+                <span className="bg-brand shrink-0 rounded-full px-1 text-[0.69rem] sm:text-[0.52rem] font-bold text-white tabular-nums">
                   {th.unread}
                 </span>
               ) : null}
@@ -271,24 +271,24 @@ function InboxScreen({ locale }: { locale: Locale }) {
         <div className="bg-paper-3 flex flex-col rounded-xl p-3">
           <div className="mb-2 flex items-center gap-1.5">
             <MessageCircle className="text-magenta size-3" aria-hidden />
-            <p className="text-ink text-[0.68rem] font-bold">Anna Weber</p>
-            <span className="text-ink-3 ml-auto flex items-center gap-1 text-[0.55rem]">
+            <p className="text-ink text-[0.86rem] sm:text-[0.68rem] font-bold">Anna Weber</p>
+            <span className="text-ink-3 ml-auto flex items-center gap-1 text-[0.73rem] sm:text-[0.55rem]">
               <Clock className="size-2.5" aria-hidden />
               22:14
             </span>
           </div>
 
-          <div className="bg-paper-2 self-start rounded-lg rounded-bl-sm px-2.5 py-1.5 text-[0.66rem]">
+          <div className="bg-paper-2 self-start rounded-lg rounded-bl-sm px-2.5 py-1.5 text-[0.86rem] sm:text-[0.66rem]">
             {vd(locale, "Tối thứ Bảy còn bàn cho 4 người không ạ?", "Sind Samstagabend noch 4 Plätze frei?")}
           </div>
 
           {/* Bản nháp AI — điểm khác biệt so với một hộp thư thường */}
           <div className="border-brand/40 bg-brand-tint mt-2.5 rounded-lg border border-dashed p-2.5">
-            <p className="text-brand-ink flex items-center gap-1 text-[0.55rem] font-bold tracking-wide uppercase">
+            <p className="text-brand-ink flex items-center gap-1 text-[0.73rem] sm:text-[0.55rem] font-bold tracking-wide uppercase">
               <Sparkles className="size-2.5" aria-hidden />
               {vd(locale, "AI soạn sẵn · tiếng Đức", "KI-Entwurf · Deutsch")}
             </p>
-            <p className="text-ink mt-1.5 text-[0.66rem] leading-relaxed">
+            <p className="text-ink mt-1.5 text-[0.86rem] sm:text-[0.66rem] leading-relaxed">
               {vd(
                 locale,
                 "Hallo Anna, ja — Samstag 19:30 Uhr haben wir noch einen Tisch für 4 Personen. Soll ich ihn für Sie reservieren?",
@@ -296,11 +296,11 @@ function InboxScreen({ locale }: { locale: Locale }) {
               )}
             </p>
             <div className="mt-2 flex items-center gap-1.5">
-              <span className="bg-brand flex items-center gap-1 rounded px-2 py-1 text-[0.58rem] font-bold text-white">
+              <span className="bg-brand flex items-center gap-1 rounded px-2 py-1 text-[0.77rem] sm:text-[0.58rem] font-bold text-white">
                 <Send className="size-2.5" aria-hidden />
                 {vd(locale, "Gửi", "Senden")}
               </span>
-              <span className="text-ink-3 text-[0.58rem]">{vd(locale, "Sửa lại", "Bearbeiten")}</span>
+              <span className="text-ink-3 text-[0.77rem] sm:text-[0.58rem]">{vd(locale, "Sửa lại", "Bearbeiten")}</span>
             </div>
           </div>
         </div>
@@ -331,7 +331,7 @@ function ReviewsScreen({ locale }: { locale: Locale }) {
                 <Star key={i} className="fill-amber text-amber size-2.5" aria-hidden />
               ))}
             </div>
-            <p className="text-ink-3 mt-1 text-[0.58rem]">
+            <p className="text-ink-3 mt-1 text-[0.77rem] sm:text-[0.58rem]">
               {vd(locale, "218 đánh giá Google", "218 Google-Bewertungen")}
             </p>
           </div>
@@ -339,11 +339,11 @@ function ReviewsScreen({ locale }: { locale: Locale }) {
           <div className="mt-3 space-y-1">
             {dist.map((row) => (
               <div key={row.star} className="flex items-center gap-1.5">
-                <span className="text-ink-3 w-2 text-[0.55rem] tabular-nums">{row.star}</span>
+                <span className="text-ink-3 w-2 text-[0.73rem] sm:text-[0.55rem] tabular-nums">{row.star}</span>
                 <span className="bg-line h-1.5 flex-1 overflow-hidden rounded-full">
                   <span className="bg-amber block h-full rounded-full" style={{ width: `${row.pct}%` }} />
                 </span>
-                <span className="text-ink-3 w-6 text-right text-[0.52rem] tabular-nums">{row.pct}%</span>
+                <span className="text-ink-3 w-6 text-right text-[0.69rem] sm:text-[0.52rem] tabular-nums">{row.pct}%</span>
               </div>
             ))}
           </div>
@@ -359,20 +359,20 @@ function ReviewsScreen({ locale }: { locale: Locale }) {
               {[0, 1, 2].map((i) => (
                 <Star key={`o${i}`} className="text-line-strong size-2.5" aria-hidden />
               ))}
-              <span className="text-magenta-ink bg-magenta-tint ml-1 rounded px-1.5 py-0.5 text-[0.52rem] font-bold">
+              <span className="text-magenta-ink bg-magenta-tint ml-1 rounded px-1.5 py-0.5 text-[0.69rem] sm:text-[0.52rem] font-bold">
                 {vd(locale, "Tiêu cực · chưa trả lời", "Negativ · unbeantwortet")}
               </span>
-              <span className="text-ink-3 ml-auto text-[0.52rem]">Kevin B.</span>
+              <span className="text-ink-3 ml-auto text-[0.69rem] sm:text-[0.52rem]">Kevin B.</span>
             </div>
-            <p className="text-ink-2 mt-1.5 text-[0.64rem] leading-relaxed">
+            <p className="text-ink-2 mt-1.5 text-[0.84rem] sm:text-[0.64rem] leading-relaxed">
               „Zu laut und der Service war überfordert.“
             </p>
             <div className="border-magenta/25 mt-2 rounded-lg border border-dashed bg-white/40 p-2">
-              <p className="text-magenta-ink flex items-center gap-1 text-[0.52rem] font-bold uppercase">
+              <p className="text-magenta-ink flex items-center gap-1 text-[0.69rem] sm:text-[0.52rem] font-bold uppercase">
                 <Sparkles className="size-2.5" aria-hidden />
                 {vd(locale, "Câu trả lời soạn sẵn", "Antwortentwurf")}
               </p>
-              <p className="text-ink mt-1 text-[0.62rem] leading-relaxed">
+              <p className="text-ink mt-1 text-[0.82rem] sm:text-[0.62rem] leading-relaxed">
                 „Lieber Kevin, danke für das ehrliche Feedback. Freitagabend war es zu voll — wir haben
                 seitdem eine zusätzliche Servicekraft eingeplant. Wir würden uns freuen, Sie erneut zu
                 begrüßen.“
@@ -385,12 +385,12 @@ function ReviewsScreen({ locale }: { locale: Locale }) {
               {[0, 1, 2, 3, 4].map((i) => (
                 <Star key={i} className="fill-amber text-amber size-2.5" aria-hidden />
               ))}
-              <span className="text-mint-ink bg-mint-tint ml-1 rounded px-1.5 py-0.5 text-[0.52rem] font-bold">
+              <span className="text-mint-ink bg-mint-tint ml-1 rounded px-1.5 py-0.5 text-[0.69rem] sm:text-[0.52rem] font-bold">
                 {vd(locale, "Đã trả lời", "Beantwortet")}
               </span>
-              <span className="text-ink-3 ml-auto text-[0.52rem]">Anna Weber</span>
+              <span className="text-ink-3 ml-auto text-[0.69rem] sm:text-[0.52rem]">Anna Weber</span>
             </div>
-            <p className="text-ink-2 mt-1.5 text-[0.64rem] leading-relaxed">
+            <p className="text-ink-2 mt-1.5 text-[0.84rem] sm:text-[0.64rem] leading-relaxed">
               {vd(
                 locale,
                 "„Phở ngon nhất Berlin, phục vụ nhanh và thân thiện.“",
@@ -423,9 +423,9 @@ function CampaignScreen({ locale }: { locale: Locale }) {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[30rem] border-collapse text-[0.64rem]">
+        <table className="w-full min-w-[30rem] border-collapse text-[0.84rem] sm:text-[0.64rem]">
           <thead>
-            <tr className="text-ink-3 text-left text-[0.55rem] uppercase">
+            <tr className="text-ink-3 text-left text-[0.73rem] sm:text-[0.55rem] uppercase">
               <th className="pb-2 font-bold">{vd(locale, "Chiến dịch", "Kampagne")}</th>
               <th className="pb-2 text-right font-bold">{vd(locale, "Tiếp cận", "Reichweite")}</th>
               <th className="pb-2 text-right font-bold">Lead</th>
@@ -452,7 +452,7 @@ function CampaignScreen({ locale }: { locale: Locale }) {
         </table>
       </div>
 
-      <p className="text-ink-3 mt-3 text-[0.62rem]">
+      <p className="text-ink-3 mt-3 text-[0.82rem] sm:text-[0.62rem]">
         {vd(
           locale,
           "Cột cuối là số quan trọng nhất: mỗi lượt đặt bàn tốn bao nhiêu tiền quảng cáo.",
@@ -513,17 +513,17 @@ function LeadsScreen({ locale }: { locale: Locale }) {
           <div key={col.title} className="bg-paper-3 rounded-lg p-2">
             <div className="mb-2 flex items-center gap-1.5">
               <span className={cn("size-1.5 rounded-full", col.tone)} aria-hidden />
-              <p className="text-ink text-[0.6rem] font-bold">{col.title}</p>
+              <p className="text-ink text-[0.79rem] sm:text-[0.6rem] font-bold">{col.title}</p>
             </div>
             {col.cards.map((card) => (
               <div key={card.name} className="bg-paper-2 border-line rounded-md border p-2">
-                <p className="text-ink truncate text-[0.62rem] font-bold">{card.name}</p>
-                <p className="text-ink-2 mt-0.5 line-clamp-2 text-[0.56rem] leading-tight">{card.need}</p>
+                <p className="text-ink truncate text-[0.82rem] sm:text-[0.62rem] font-bold">{card.name}</p>
+                <p className="text-ink-2 mt-0.5 line-clamp-2 text-[0.74rem] sm:text-[0.56rem] leading-tight">{card.need}</p>
                 <div className="mt-1.5 flex items-center justify-between gap-1">
-                  <span className="text-ink text-[0.6rem] font-extrabold tabular-nums">{card.val}</span>
+                  <span className="text-ink text-[0.79rem] sm:text-[0.6rem] font-extrabold tabular-nums">{card.val}</span>
                   <span
                     className={cn(
-                      "rounded px-1 py-0.5 text-[0.5rem] font-bold",
+                      "rounded px-1 py-0.5 text-[0.68rem] sm:text-[0.5rem] font-bold",
                       card.urgent ? "bg-magenta-tint text-magenta-ink" : "text-ink-3 bg-paper-3",
                     )}
                   >
@@ -536,7 +536,7 @@ function LeadsScreen({ locale }: { locale: Locale }) {
         ))}
       </div>
 
-      <p className="text-ink-3 mt-3 flex items-center gap-1.5 text-[0.62rem]">
+      <p className="text-ink-3 mt-3 flex items-center gap-1.5 text-[0.82rem] sm:text-[0.62rem]">
         <Hash className="size-2.5" aria-hidden />
         {vd(
           locale,
@@ -556,6 +556,6 @@ function Screen({ children }: { children: React.ReactNode }) {
 
 function Chip({ children, tone }: { children: React.ReactNode; tone: string }) {
   return (
-    <span className={cn("rounded-full px-2 py-0.5 text-[0.58rem] font-bold", tone)}>{children}</span>
+    <span className={cn("rounded-full px-2 py-0.5 text-[0.77rem] sm:text-[0.58rem] font-bold", tone)}>{children}</span>
   );
 }

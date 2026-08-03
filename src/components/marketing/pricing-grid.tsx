@@ -18,13 +18,17 @@ const TONES: Record<string, { tint: string; text: string; dot: string }> = {
 
 export function PricingGrid({ locale, t }: { locale: Locale; t: Dictionary["pricing"] }) {
   return (
-    <RevealGroup className="grid items-stretch gap-5 lg:grid-cols-4">
+    <RevealGroup
+      /* Mobile: bốn gói cuộn ngang thay vì chồng dọc gần ba màn hình. So sánh
+         gói cạnh nhau cũng dễ hơn khi vuốt qua lại. */
+      className="no-scrollbar -mx-5 grid snap-x snap-mandatory grid-flow-col auto-cols-[82vw] items-stretch gap-5 overflow-x-auto px-5 sm:mx-0 sm:auto-cols-auto sm:grid-flow-row sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-4"
+    >
       {t.plans.map((plan) => {
         const featured = plan.key === HIGHLIGHTED;
         const tone = TONES[plan.key] ?? TONES.STARTER;
 
         return (
-          <RevealItem key={plan.key} className={cn(featured && "lg:-my-4")}>
+          <RevealItem key={plan.key} className={cn("snap-start", featured && "lg:-my-4")}>
             <div
               className={cn(
                 "lv-card lv-card-hover flex h-full flex-col rounded-3xl p-7",
