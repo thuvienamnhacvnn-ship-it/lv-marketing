@@ -79,9 +79,15 @@ export function SiteHeader({
         )}
       >
         <div className="lv-container flex h-16 items-center justify-between gap-5">
+          {/*
+            Ẩn trên mobile: banner đã có một logo lớn ở giữa, để thêm logo nhỏ
+            trên header là hai logo chồng nhau trong cùng một khung nhìn. Điều
+            hướng trên điện thoại đã có thanh tab ở đáy, nên header chỉ còn giữ
+            các nút phụ trợ.
+          */}
           <Link
             href={`/${locale}`}
-            className="focus-visible:ring-brand/50 shrink-0 rounded-full focus-visible:ring-2 focus-visible:outline-none"
+            className="focus-visible:ring-brand/50 hidden shrink-0 rounded-full focus-visible:ring-2 focus-visible:outline-none lg:inline-flex"
           >
             <LvLogo size={36} withWordmark priority />
           </Link>
@@ -136,7 +142,8 @@ export function SiteHeader({
             </Button>
           </div>
 
-          <div className="flex items-center gap-1 lg:hidden">
+          {/* ml-auto: không còn logo bên trái nên cụm nút phải tự đẩy sang phải. */}
+          <div className="ml-auto flex items-center gap-1 lg:ml-0 lg:hidden">
             <ThemeSwitcher locale={locale} current={theme} />
             <LocaleSwitcher locale={locale} />
             <Sheet open={open} onOpenChange={setOpen}>

@@ -53,15 +53,30 @@ export function HeroStage({ locale, t }: { locale: Locale; t: Dictionary["hero"]
           giữ nguyên con số cho dễ chỉnh lại sau. Chỉ áp dụng từ `lg` trở lên —
           màn hẹp mà thụt vào 3cm thì chữ không còn chỗ.
         */}
-        <div className="w-full lg:ms-[3cm]">
+        {/*
+          Mobile: cả cụm căn giữa và dùng `flex-col` để đổi được thứ tự — hai nút
+          phải xuống dưới cùng, sau dải tin cậy. Từ `lg` trở lên quay về căn trái.
+        */}
+        <div className="flex w-full flex-col items-center text-center lg:items-start lg:text-left lg:ms-[3cm]">
           {/* ── Logo LV cỡ lớn ─────────────────────────────── */}
           <motion.div
             initial={reduce ? false : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55 }}
-            className="flex flex-wrap items-center gap-5"
+            className="flex flex-col items-center gap-4 lg:flex-row lg:flex-wrap lg:gap-5"
           >
-            <LvLogo size={104} priority className="shrink-0" />
+            {/*
+              Mobile hiện logo `mark` (nền trong suốt) ở đúng 2cm — dùng đơn vị
+              `cm` thật của CSS, không quy đổi ra px, để con số khớp yêu cầu.
+              Từ `lg` quay lại huy hiệu 104px xếp cạnh chữ như cũ.
+            */}
+            <LvLogo
+              variant="mark"
+              size={76}
+              priority
+              className="w-[2cm] shrink-0 [&_img]:h-auto [&_img]:w-full lg:hidden"
+            />
+            <LvLogo size={104} priority className="hidden shrink-0 lg:inline-flex" />
             <span className="flex flex-col leading-none">
               <span className="font-display text-ink text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl">
                 LV GROUP
@@ -146,11 +161,14 @@ export function HeroStage({ locale, t }: { locale: Locale; t: Dictionary["hero"]
             initial={reduce ? false : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.42 }}
-            className="mt-7 flex flex-wrap items-center gap-3"
+            /* `order-last` đẩy hai nút xuống cuối cột trên mobile. Lưới một cột
+               làm hai nút dài bằng nhau — chia đôi hàng ngang sẽ khiến nút có
+               chữ dài hơn bị xuống dòng, trông lệch. */
+            className="order-last mt-7 grid w-full grid-cols-1 gap-3 lg:order-none lg:mt-7 lg:flex lg:w-auto lg:flex-wrap lg:items-center"
           >
             <Button
               size="xl"
-              className="rounded-full shadow-[var(--shadow-brand)]"
+              className="w-full rounded-full shadow-[var(--shadow-brand)] lg:w-auto"
               render={<Link href="/register" />}
             >
               {t.primaryCta}
@@ -159,7 +177,7 @@ export function HeroStage({ locale, t }: { locale: Locale; t: Dictionary["hero"]
             <Button
               size="xl"
               variant="outline"
-              className="rounded-full"
+              className="w-full rounded-full lg:w-auto"
               render={<Link href={`/${locale}/lien-he`} />}
             >
               <Play className="size-4" aria-hidden />
@@ -172,7 +190,7 @@ export function HeroStage({ locale, t }: { locale: Locale; t: Dictionary["hero"]
             initial={reduce ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.52 }}
-            className="border-line mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 border-t pt-6"
+            className="border-line mt-8 flex w-full flex-wrap items-center justify-center gap-x-6 gap-y-3 border-t pt-6 lg:justify-start"
           >
             <span className="flex -space-x-2.5">
               {(["portraitWoman", "portraitMan", "teamWorking"] as const).map((name) => (
