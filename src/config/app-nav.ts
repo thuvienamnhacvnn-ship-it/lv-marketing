@@ -28,7 +28,7 @@ export const NAV_GROUPS: { key: NavGroupKey; items: NavItem[] }[] = [
     key: "groupWork",
     items: [
       { key: "overview", path: "", icon: "gauge" },
-      { key: "studio", path: "studio", icon: "sparkles", permission: "ai:generate", soon: true },
+      { key: "studio", path: "studio", icon: "sparkles", permission: "ai:generate" },
       { key: "calendar", path: "calendar", icon: "calendar", permission: "calendar:manage", soon: true },
       { key: "publishing", path: "publishing", icon: "send", permission: "content:publish", soon: true },
       { key: "channels", path: "channels", icon: "share", permission: "channel:manage", soon: true },
