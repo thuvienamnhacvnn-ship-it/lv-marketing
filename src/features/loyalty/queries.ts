@@ -14,7 +14,7 @@ export async function loadLoyaltyOverview(organizationId: string) {
   const last30 = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
   const [program, tiers, accountAggregate, memberCount, newMembers30d, earned30d, redeemed30d, rewards, vouchers] =
-    await prisma.$transaction([
+    await Promise.all([
       prisma.loyaltyProgram.findFirst({
         where: { organizationId, isActive: true },
         include: { rules: { where: { isActive: true }, orderBy: { value: "desc" } } },
@@ -92,7 +92,7 @@ export async function loadRecentPointTransactions(organizationId: string, take =
 
 /** Quà và voucher đang mở, kèm số lần đã phát. */
 export async function loadRewardsAndVouchers(organizationId: string) {
-  const [rewards, vouchers] = await prisma.$transaction([
+  const [rewards, vouchers] = await Promise.all([
     prisma.reward.findMany({
       where: { organizationId },
       orderBy: { pointsCost: "asc" },

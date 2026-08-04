@@ -78,7 +78,7 @@ export async function loadMonthSummary(organizationId: string, year: number, mon
   const { gridStart, gridEnd } = monthRange(year, month);
   const where = { organizationId, targetDate: { gte: gridStart, lt: gridEnd } };
 
-  const [total, waiting, approved, scheduled, published, unscheduled] = await prisma.$transaction([
+  const [total, waiting, approved, scheduled, published, unscheduled] = await Promise.all([
     prisma.contentItem.count({ where }),
     prisma.contentItem.count({ where: { ...where, status: "WAITING_APPROVAL" } }),
     prisma.contentItem.count({ where: { ...where, status: "APPROVED" } }),

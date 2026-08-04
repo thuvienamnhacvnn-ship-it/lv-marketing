@@ -31,7 +31,7 @@ export async function loadWorkspaceSnapshot(organizationId: string): Promise<Wor
     runningCampaigns,
     newLeads,
     overdueFollowUps,
-  ] = await prisma.$transaction([
+  ] = await Promise.all([
     prisma.publishedPost.count({
       where: { organizationId, publishedAt: { gte: last7 } },
     }),
@@ -80,7 +80,7 @@ export async function loadWorkspaceSnapshot(organizationId: string): Promise<Wor
 
 /** Vài việc gần đây để màn hình Tổng quan không chỉ toàn con số. */
 export async function loadRecentActivity(organizationId: string) {
-  const [content, conversations, reviews] = await prisma.$transaction([
+  const [content, conversations, reviews] = await Promise.all([
     prisma.contentItem.findMany({
       where: { organizationId },
       orderBy: { updatedAt: "desc" },
