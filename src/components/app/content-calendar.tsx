@@ -148,6 +148,13 @@ export function ContentCalendar({
 
   return (
     <DndContext
+      /*
+        `id` cố định là bắt buộc. Không truyền thì dnd-kit tự sinh id cho phần mô
+        tả trợ năng bằng một bộ đếm toàn cục — server render ra "DndDescribedBy-0"
+        còn trình duyệt ra "-1", "-2"… nên React báo hydration mismatch và bỏ
+        luôn phần chênh lệch thay vì vá lại.
+      */
+      id="lv-content-calendar"
       sensors={sensors}
       onDragStart={(e: DragStartEvent) =>
         setDragging(optimistic.find((i) => i.id === String(e.active.id)) ?? null)
