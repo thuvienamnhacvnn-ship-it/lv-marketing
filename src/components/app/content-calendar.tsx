@@ -12,19 +12,23 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
-import { ChevronLeft, ChevronRight, GripVertical, Inbox } from "lucide-react";
+import { ChevronLeft, ChevronRight, GripVertical, Inbox, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { moveContentAction } from "@/features/calendar/actions";
+import { ContentEditor, type EditorItem } from "@/components/app/content-editor";
 import { cn } from "@/lib/utils";
 import type { Locale } from "@/i18n/config";
 
 export type CalendarItem = {
   id: string;
   title: string;
+  body?: string;
   status: string;
   type: string;
   language: string;
+  callToAction?: string | null;
+  hashtags?: string[];
   targetDate: Date | string | null;
 };
 
@@ -64,6 +68,7 @@ export function ContentCalendar({
   items: CalendarItem[];
 }) {
   const [dragging, setDragging] = useState<CalendarItem | null>(null);
+  const [editor, setEditor] = useState<{ item: EditorItem | null; day?: string } | null>(null);
   const [, startTransition] = useTransition();
 
   /*
@@ -166,6 +171,14 @@ export function ContentCalendar({
         <p className="text-ink text-lg font-extrabold capitalize">{monthLabel}</p>
         <div className="flex items-center gap-1.5">
           <Button
+            size="sm"
+            className="mr-1 rounded-full"
+            onClick={() => setEditor({ item: null, day: todayKey })}
+          >
+            <Plus className="size-3.5" aria-hidden />
+            Nội dung mới
+          </Button>
+          <Button
             variant="outline"
             size="icon"
             className="rounded-full"
@@ -214,6 +227,8 @@ export function ContentCalendar({
                   inMonth={day.getUTCMonth() === month}
                   isToday={key === todayKey}
                   items={byDay.get(key) ?? []}
+                  onAdd={() => setEditor({ item: null, day: key })}
+                  onOpen={(item) => setEditor({ item })}
                 />
               );
             })}
@@ -221,8 +236,16 @@ export function ContentCalendar({
         </div>
 
         {/* ── Chưa xếp lịch ──────────────────────────────── */}
-        <UnscheduledColumn items={unscheduled} />
+        <UnscheduledColumn items={unscheduled} onOpen={(item) => setEditor({ item })} />
       </div>
+
+      <ContentEditor
+        slug={slug}
+        open={editor !== null}
+        item={editor?.item ?? null}
+        defaultDayKey={editor?.day}
+        onClose={() => setEditor(null)}
+      />
 
       <DragOverlay dropAnimation={null}>
         {dragging ? (
@@ -246,12 +269,16 @@ function DayCell({
   inMonth,
   isToday,
   items,
+  onAdd,
+  onOpen,
 }: {
   dayKey: string;
   dayNumber: number;
   inMonth: boolean;
   isToday: boolean;
   items: CalendarItem[];
+  onAdd: () => void;
+  onOpen: (item: CalendarItem) => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: dayKey });
 
@@ -259,33 +286,51 @@ function DayCell({
     <div
       ref={setNodeRef}
       className={cn(
-        "min-h-[6.5rem] rounded-xl border p-1.5 transition-colors",
+        "group/day relative min-h-[6.5rem] rounded-xl border p-1.5 transition-colors",
         inMonth ? "border-line bg-paper-2" : "border-line/60 bg-paper-3/40",
         isOver && "border-brand bg-brand-tint/50",
       )}
     >
-      <p
-        className={cn(
-          "mb-1 px-0.5 text-[0.62rem] font-bold tabular-nums",
-          isToday
-            ? "bg-brand inline-block rounded-full px-1.5 text-white"
-            : inMonth
-              ? "text-ink-2"
-              : "text-ink-3/60",
-        )}
-      >
-        {dayNumber}
-      </p>
+      <div className="mb-1 flex items-center justify-between">
+        <p
+          className={cn(
+            "px-0.5 text-[0.62rem] font-bold tabular-nums",
+            isToday
+              ? "bg-brand rounded-full px-1.5 text-white"
+              : inMonth
+                ? "text-ink-2"
+                : "text-ink-3/60",
+          )}
+        >
+          {dayNumber}
+        </p>
+        {/* Nút thêm chỉ hiện khi rê chuột vào ô — 42 dấu cộng lúc nào cũng hiện
+            sẽ làm lưới rối mắt. */}
+        <button
+          type="button"
+          onClick={onAdd}
+          aria-label={`Thêm nội dung ngày ${dayNumber}`}
+          className="text-ink-3 hover:bg-paper-3 hover:text-ink rounded p-0.5 opacity-0 transition-opacity group-hover/day:opacity-100 focus-visible:opacity-100"
+        >
+          <Plus className="size-3" aria-hidden />
+        </button>
+      </div>
       <div className="space-y-1">
         {items.map((item) => (
-          <ItemCard key={item.id} item={item} />
+          <ItemCard key={item.id} item={item} onOpen={() => onOpen(item)} />
         ))}
       </div>
     </div>
   );
 }
 
-function UnscheduledColumn({ items }: { items: CalendarItem[] }) {
+function UnscheduledColumn({
+  items,
+  onOpen,
+}: {
+  items: CalendarItem[];
+  onOpen: (item: CalendarItem) => void;
+}) {
   const { setNodeRef, isOver } = useDroppable({ id: UNSCHEDULED_ID });
 
   return (
@@ -308,14 +353,14 @@ function UnscheduledColumn({ items }: { items: CalendarItem[] }) {
         {items.length === 0 ? (
           <p className="text-ink-3 py-4 text-center text-xs">Trống</p>
         ) : (
-          items.map((item) => <ItemCard key={item.id} item={item} />)
+          items.map((item) => <ItemCard key={item.id} item={item} onOpen={() => onOpen(item)} />)
         )}
       </div>
     </div>
   );
 }
 
-function ItemCard({ item }: { item: CalendarItem }) {
+function ItemCard({ item, onOpen }: { item: CalendarItem; onOpen: () => void }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: item.id });
 
   return (
@@ -323,6 +368,9 @@ function ItemCard({ item }: { item: CalendarItem }) {
       ref={setNodeRef}
       {...listeners}
       {...attributes}
+      // PointerSensor đặt ngưỡng 6px nên cú bấm dứt khoát không bị nuốt thành
+      // thao tác kéo; `onClick` vẫn nổ bình thường.
+      onClick={onOpen}
       title={item.title}
       className={cn(
         "flex cursor-grab items-start gap-1 rounded-lg border px-1.5 py-1 text-left text-[0.62rem] leading-tight font-semibold transition-opacity active:cursor-grabbing",

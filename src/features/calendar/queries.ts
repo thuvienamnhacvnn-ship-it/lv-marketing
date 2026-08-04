@@ -32,9 +32,12 @@ export async function loadMonthContent(organizationId: string, year: number, mon
     select: {
       id: true,
       title: true,
+      body: true,
       status: true,
       type: true,
       language: true,
+      callToAction: true,
+      hashtags: true,
       targetDate: true,
     },
   });
@@ -57,7 +60,17 @@ export async function loadUnscheduled(organizationId: string, take = 12) {
     where: { organizationId, targetDate: null },
     orderBy: { createdAt: "desc" },
     take,
-    select: { id: true, title: true, status: true, type: true, language: true, targetDate: true },
+    select: {
+      id: true,
+      title: true,
+      body: true,
+      status: true,
+      type: true,
+      language: true,
+      callToAction: true,
+      hashtags: true,
+      targetDate: true,
+    },
   });
 }
 
