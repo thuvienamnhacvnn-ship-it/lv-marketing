@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Coins, Gift, Ticket, TrendingDown, TrendingUp, UserPlus, Users } from "lucide-react";
 import { requirePermission } from "@/server/tenant";
 import {
@@ -92,7 +93,8 @@ export default async function LoyaltyPage({ params }: { params: Promise<{ slug: 
       <div className="mt-6 grid gap-5 xl:grid-cols-[1.25fr_1fr]">
         {/* ── Thành viên ─────────────────────────────────── */}
         <section className="lv-card rounded-2xl p-5">
-          <h2 className="text-ink mb-4 text-sm font-bold">Thành viên tích luỹ nhiều nhất</h2>
+          <h2 className="text-ink mb-1 text-sm font-bold">Thành viên tích luỹ nhiều nhất</h2>
+          <p className="text-ink-3 mb-3.5 text-xs">Bấm vào tên để xem sổ điểm, cộng điểm và mở thẻ của khách.</p>
           {members.length === 0 ? (
             <p className="text-ink-3 py-8 text-center text-sm">{t.common.empty}</p>
           ) : (
@@ -113,12 +115,17 @@ export default async function LoyaltyPage({ params }: { params: Promise<{ slug: 
                     return (
                       <tr key={account.id} className="border-line border-b last:border-0">
                         <td className="py-2.5 pr-3">
-                          <span className="text-ink block font-semibold">
-                            {account.customer.fullName}
-                          </span>
-                          <span className="text-ink-3 block font-mono text-[0.65rem]">
-                            {account.memberCode}
-                          </span>
+                          <Link
+                            href={`/app/${slug}/loyalty/${account.customerId}`}
+                            className="group block"
+                          >
+                            <span className="text-ink group-hover:text-brand-ink block font-semibold transition-colors">
+                              {account.customer.fullName}
+                            </span>
+                            <span className="text-ink-3 block font-mono text-[0.65rem]">
+                              {account.memberCode}
+                            </span>
+                          </Link>
                         </td>
                         <td className="py-2.5 pr-3">
                           {tier ? (
