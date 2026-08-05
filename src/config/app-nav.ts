@@ -33,7 +33,7 @@ export const NAV_GROUPS: { key: NavGroupKey; items: NavItem[] }[] = [
       { key: "publishing", path: "publishing", icon: "send", permission: "content:publish", soon: true },
       { key: "channels", path: "channels", icon: "share", permission: "channel:manage", soon: true },
       { key: "inbox", path: "inbox", icon: "inbox", permission: "inbox:read" },
-      { key: "crm", path: "crm", icon: "users", permission: "crm:read", soon: true },
+      { key: "crm", path: "crm", icon: "users", permission: "crm:read" },
     ],
   },
   {

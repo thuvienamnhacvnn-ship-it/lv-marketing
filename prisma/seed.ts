@@ -317,9 +317,14 @@ async function seedCrm(organizationId: string) {
     });
   }
 
-  const newStage = await prisma.pipelineStage.findUnique({
-    where: { organizationId_key: { organizationId, key: "NEW" } },
-  });
+  // Tra cột theo đúng `status` của từng lead. Gán tất cả vào một cột thì bảng
+  // phễu và `status` nói hai chuyện khác nhau.
+  const stageByKey = new Map(
+    (await prisma.pipelineStage.findMany({ where: { organizationId } })).map((stage) => [
+      stage.key,
+      stage.id,
+    ]),
+  );
 
   const leads = [
     { fullName: "Sabine Krüger", need: "Đặt tiệc sinh nhật 20 khách", value: 68000, status: "NEW" as const },
@@ -331,7 +336,7 @@ async function seedCrm(organizationId: string) {
     await prisma.lead.create({
       data: {
         organizationId,
-        stageId: newStage?.id ?? null,
+        stageId: stageByKey.get(lead.status) ?? null,
         fullName: lead.fullName,
         need: lead.need,
         source: "Google Business",
